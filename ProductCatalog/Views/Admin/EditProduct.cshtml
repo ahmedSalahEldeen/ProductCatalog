@@ -1,0 +1,57 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+@model ProductCatalog.Models.Product
+
+<h1>Edit Product</h1>
+
+<h1>Edit Product</h1>
+
+<form asp-action="EditProduct" method="post" enctype="multipart/form-data">
+    <div class="mb-3">
+        <label for="Name" class="form-label">Product Name</label>
+        <input type="text" class="form-control" id="Name" name="Name" value="@Model.Name" required>
+    </div>
+
+    <div class="mb-3">
+        <label for="Price" class="form-label">Price</label>
+        <input type="number" class="form-control" id="Price" name="Price" value="@Model.Price" step="0.01" required>
+    </div>
+
+    <div class="mb-3">
+        <label for="StartDate" class="form-label">Start Date</label>
+        <input type="date" class="form-control" id="StartDate" name="StartDate" value="@Model.StartDate.ToString("yyyy-MM-dd")" required>
+    </div>
+
+    <div class="mb-3">
+        <label for="DurationInMinutes" class="form-label">Duration (in minutes)</label>
+        <input type="number" class="form-control" id="DurationInMinutes" name="DurationInMinutes" value="@Model.DurationInMinutes" required>
+    </div>
+
+    <div class="mb-3">
+        <label for="CategoryId" class="form-label">Category</label>
+        @* <select class="form-control" id="CategoryId" name="CategoryId" required> *@
+        @*     @foreach (var category in ViewData["Categories"] as List<Category>) *@
+        @*     { *@
+        @*         <option value="@category.Id" @(category.Id == Model.CategoryId ? "selected" : "")>@category.Name</option> *@
+        @*     } *@
+        @* </select> *@
+    </div>
+
+    <div class="mb-3">
+        <label for="ImageFile" class="form-label">Upload Product Image</label>
+        <input type="file" class="form-control" id="ImageFile" name="ImageFile">
+        @if (!string.IsNullOrEmpty(Model.ImageFilePath))
+        {
+            <div class="mt-2">
+                <img src="@Url.Content(Model.ImageFilePath)" alt="Product Image" class="img-fluid" style="max-width: 200px;">
+            </div>
+        }
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save Changes</button>
+    <a href="@Url.Action("AllProducts")" class="btn btn-secondary">Cancel</a>
+</form>
