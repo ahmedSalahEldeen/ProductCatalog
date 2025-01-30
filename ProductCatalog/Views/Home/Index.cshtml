@@ -1,37 +1,41 @@
-﻿@* @{ *@
-@*     ViewData["Title"] = "Home Page"; *@
-@* } *@
+﻿
+@* @model List<ProductCatalog.Models.Product> *@
 
-@* <div class="text-center"> *@
-@*     <h1 class="display-4">Welcome</h1> *@
-@*     <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p> *@
-@* </div> *@
-
-
-@model List<ProductCatalog.Models.Product>
+@model ProductCatalog.Models.ViewModels.ProductListViewModel
 
 <h1 class="text-center mb-4">Product Catalog</h1>
-<a asp-action="AddProduct" class="btn btn-primary" asp-controller="Admin">Add New Product</a>
-<div class="container py-5">
-   
-    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
 
-        @foreach (var product in Model)
+<!-- Category Filter -->
+<form method="get" asp-action="Index">
+    <label for="category" style="font-weight:bold">Filter by Category:</label>
+    <select name="categoryId" id="category" class="form-select  d-block " onchange="this.form.submit()">
+        <option value="">All Categories</option>
+        @foreach (var category in Model.Categories)
+        {
+            <option value="@category.Id" selected="@(category.Id == Model.SelectedCategoryId)">
+                @category.Name
+            </option>
+        }
+    </select>
+</form>
+<hr />
+<div class="container py-5">
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
+        @foreach (var product in Model.Products)
         {
             <div class="col">
                 <div class="card product-card">
-                <img src="@product.ImageFilePath" class="card-img-top product-img" style="height:150px" alt="Product 1">
-                <div class="card-body">
+                    <img src="@product.ImageFilePath" class="card-img-top product-img" style="height:150px" alt="@product.Name">
+                    <div class="card-body">
                         <h5 class="card-title">@product.Name</h5>
                         <p class="product-price">@product.Price.ToString("C")</p>
                         <div class="text-center">
-                        <a class="btn btn-primary d-block" asp-action="ProductDetails" asp-route-id="@product.Id">View Product</a>
+                            <a class="btn btn-primary d-block" asp-action="ProductDetails" asp-route-id="@product.Id">View Product</a>
                         </div>
+                    </div>
                 </div>
             </div>
-        </div>
         }
+    </div>
+</div>
 
-
-        </div>
-        </div>

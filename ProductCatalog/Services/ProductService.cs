@@ -11,16 +11,28 @@ namespace ProductCatalog.Services
             _productRepository = productRepository;
         }
 
+        // For anonymous users: Get only active products that are currently availabl, optionally filtered by category
 
-        public async Task<IEnumerable<Product>> GetActiveProductsAsync()
+        public async Task<IEnumerable<Product>> GetActiveProductsAsync(int? categoryId = null)
         {
-            return await _productRepository.GetActiveProductsAsync();
+            return await _productRepository.GetActiveProductsAsync(categoryId);
+        }
+        // For admin users: [admin can view all products, not just active ones] Get all products, optionally filtered by category
+
+        public async Task<IEnumerable<Product>> GetAllProductsAsync(int? categoryId = null)
+        {
+            return await _productRepository.GetAllProductsAsync(categoryId);
         }
 
-        public async Task<IEnumerable<Product>> GetAllProductsAsync()
+        public async Task<IEnumerable<Product>> GetProductsWithCategory(int? categoryId)
         {
-            return await _productRepository.GetAllProductsAsync();
+            return await _productRepository.GetProductsByCategoryAsync(categoryId);
         }
+        public async Task<Product> GetProductByIdAsync(int id)
+        {
+            return await _productRepository.GetProductByIdAsync(id);
+        }
+
 
         public async Task AddProductAsync(Product product, string userId)
         {

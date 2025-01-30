@@ -13,19 +13,33 @@ namespace ProductCatalog.Repositories
 
         }
 
-        public async Task<IEnumerable<Product>> GetActiveProductsAsync()
+        public async Task<IEnumerable<Product>> GetActiveProductsAsync(int? categoryId = null)
         {
             var currentDateTime = DateTime.UtcNow;
-
-            return await _context.products
+            //using flitration filter by category
+            var query =  _context.products
                 .Include(p => p.Category)
                 .Where(p => p.StartDate <= currentDateTime &&
                               currentDateTime <= p.StartDate.AddMinutes(p.DurationInMinutes))
-                .ToListAsync();
+                .AsQueryable();
+
+            if (categoryId.HasValue && categoryId > 0)
+            {
+                query = query.Where(p => p.CategoryId == categoryId.Value);
+            }
+            return await query.ToListAsync();
+
         }
-        public async Task<IEnumerable<Product>> GetAllProductsAsync()
+        public async Task<IEnumerable<Product>> GetAllProductsAsync(int? categoryId = null)
         {
-            return await _context.products.Include(p => p.Category).ToListAsync();
+            var query = _context.products
+            .Include(p => p.Category)
+            .AsQueryable();
+            if (categoryId.HasValue && categoryId > 0)
+            {
+                query = query.Where(p => p.CategoryId == categoryId.Value);
+            }
+            return await query.ToListAsync();
         }
 
         public async Task<Product> GetProductByIdAsync(int id)
@@ -34,7 +48,17 @@ namespace ProductCatalog.Repositories
                .Include(p => p.Category)
                .FirstOrDefaultAsync(p => p.Id == id);
         }
+        public async Task<IEnumerable<Product>> GetProductsByCategoryAsync(int? categoryId)
+        {
+            var query = _context.products.Include(p => p.Category).AsQueryable();
 
+            if (categoryId.HasValue && categoryId > 0)
+            {
+                query = query.Where(p => p.CategoryId == categoryId.Value);
+            }
+
+            return await query.ToListAsync();
+        }
 
         public async Task AddProductAsync(Product product)
         {

@@ -1,0 +1,14 @@
+﻿@model ProductCatalog.Models.Product
+
+<h1>@Model.Name - Details</h1>
+
+<div>
+    <img src="@Model.ImageFilePath" alt="@Model.Name" class="img-fluid" />
+</div>
+
+<p><strong>Price:</strong> @Model.Price.ToString("C")</p>
+<p><strong>Description:</strong> @Model.Name</p>
+
+<div>
+    <a href="@Url.Action("Index", "Home")" class="btn btn-primary">Back to Product List</a>
+</div>

@@ -5,8 +5,17 @@ using ProductCatalog.Data;
 using ProductCatalog.Helpers;
 using ProductCatalog.Repositories;
 using ProductCatalog.Services;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Configure Serilog for file logging
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .WriteTo.File("logs/log.txt", rollingInterval: RollingInterval.Day)
+    .CreateLogger();
+
+builder.Host.UseSerilog(); // Use Serilog for logging
 
 // Add services to the container.
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
@@ -18,24 +27,27 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.Requ
     .AddRoles<IdentityRole>() // Enable roles
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
+
+
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
-
 builder.Services.AddScoped<ProductService>();
 builder.Services.AddScoped<categoryService>();
 builder.Services.AddControllersWithViews();
 
 
+//Configure images maxmum size
 builder.Services.Configure<FormOptions>(options =>
 {
     options.MultipartBodyLengthLimit = 1 * 1024 * 1024; // Set limit to 1 MB
 });
 
 
-
 var app = builder.Build();
+// Use Serilog request logging
+app.UseSerilogRequestLogging();
 
-// Seed Roles and Admin User
+
 // Seed roles and admin user
 using (var scope = app.Services.CreateScope())
 {
@@ -47,6 +59,7 @@ using (var scope = app.Services.CreateScope())
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+    app.UseExceptionHandler("/Home/Error");
     app.UseMigrationsEndPoint();
 }
 else

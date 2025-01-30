@@ -8,8 +8,6 @@
 
 <h1>Edit Product</h1>
 
-<h1>Edit Product</h1>
-
 <form asp-action="EditProduct" method="post" enctype="multipart/form-data">
     <div class="mb-3">
         <label for="Name" class="form-label">Product Name</label>
@@ -53,5 +51,5 @@
     </div>
 
     <button type="submit" class="btn btn-primary">Save Changes</button>
-    <a href="@Url.Action("AllProducts")" class="btn btn-secondary">Cancel</a>
+    <a href="@Url.Action("Index")" class="btn btn-secondary">Cancel</a>
 </form>

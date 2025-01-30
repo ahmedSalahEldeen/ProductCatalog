@@ -10,12 +10,14 @@ namespace ProductCatalog.Controllers
     [Authorize(Roles = "Admin")]
     public class AdminController : Controller
     {
+        private readonly ILogger<HomeController> _logger;
         private readonly ProductService _productService;
         private readonly categoryService _categoryService;
         private readonly IHostEnvironment _hostEnvironment;
 
-        public AdminController(ProductService productService, categoryService categoryService, IHostEnvironment hostEnvironment)
+        public AdminController(ILogger<HomeController> logger, ProductService productService, categoryService categoryService, IHostEnvironment hostEnvironment)
         {
+            _logger = logger;
             _productService = productService;
             _categoryService = categoryService;
             _hostEnvironment = hostEnvironment;
@@ -106,8 +108,8 @@ namespace ProductCatalog.Controllers
             product.CreatedByUserId = userId;
             // Add the product to the database
             await _productService.AddProductAsync(product, userId);
-            // Redirect to the AllProducts page after successful addition
-            return RedirectToAction("AllProducts");
+            // Redirect to the AllProducts page after successful adding new product
+            return RedirectToAction("Index");
         }
 
         [HttpGet]
@@ -123,7 +125,7 @@ namespace ProductCatalog.Controllers
         {
             if (ModelState.IsValid)
             {
-                // Check if there's a new image
+                // Check if there is  new image
                 if (product.ImageFile != null)
                 {
                     // Handle image upload
@@ -141,14 +143,37 @@ namespace ProductCatalog.Controllers
                 var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 await _productService.EditProductAsync(product, userId);
             }
-            return RedirectToAction("AllProducts");
+
+            _logger.LogError("An error occurred while Updating  products.");
+            return View("Error");
+            //return RedirectToAction("Index");
         }
 
+        [HttpGet]
         public async Task<IActionResult> DeleteProduct(int id)
         {
+            var product = await _productService.GetProductByIdAsync(id);
+            if (product == null)
+            {
+                return NotFound();
+            }
+
+            return View("DeleteProduct", product);
+
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var product = await _productService.GetProductByIdAsync(id);
+
+            if (product == null)
+            {
+                return NotFound();
+            }
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             await _productService.DeleteProductAsync(id, userId);
-            return RedirectToAction("index");
+            return RedirectToAction("Index");
         }
     }
 }
